@@ -5,7 +5,8 @@
     "outDir": "dist",
     "module": "commonjs",
     "declaration": true,
-    "allowJs": true
+    "allowJs": true,
+    "skipLibCheck": true
   },
   "exclude": ["src/react-codesandboxer"]
 }

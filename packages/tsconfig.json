@@ -11,6 +11,7 @@
       "es2017.sharedmemory"
     ],
     "resolveJsonModule": true,
+    "skipLibCheck": true,
     "jsx": "react",
     "allowJs": true,
     "checkJs": false
