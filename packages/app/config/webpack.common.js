@@ -23,7 +23,8 @@ const __PROD__ = NODE_ENV === 'production'; // eslint-disable-line no-underscore
 const __PROFILING__ = Boolean(process.env.PROFILING); // eslint-disable-line no-underscore-dangle
 // const __TEST__ = NODE_ENV === 'test'; // eslint-disable-line no-underscore-dangle
 const babelConfig = __DEV__ ? babelDev : babelProd;
-const publicPath = SANDBOX_ONLY || __DEV__ ? '/' : getHost.default() + '/';
+const publicPath =
+  SANDBOX_ONLY || __DEV__ ? (__DEV__ ? '/' : '/') : getHost.default() + '/';
 const isLint = 'LINT' in process.env;
 
 // common function to get style loaders
@@ -412,14 +413,13 @@ module.exports = {
         : {}),
     },
   },
-
   plugins: [
     ...(SANDBOX_ONLY
       ? [
           new HtmlWebpackPlugin({
             inject: true,
             chunks: ['sandbox-startup', 'vendors~sandbox', 'sandbox'],
-            filename: 'index.html',
+            filename: 'bundler.html',
             template: paths.sandboxHtml,
             minify: __PROD__ && {
               removeComments: true,
@@ -521,6 +521,11 @@ module.exports = {
     // Makes some environment variables available to the JS code, for example:
     // if (process.env.NODE_ENV === 'development') { ... }. See `env.js`.
     new webpack.DefinePlugin(env.default),
+    SANDBOX_ONLY &&
+      __DEV__ &&
+      new webpack.DefinePlugin({
+        'process.env.CODESANDBOX_HOST': publicPath.replace(/\/+$/, ''),
+      }),
 
     new webpack.DefinePlugin({ __DEV__ }),
     // Watcher doesn't work well if you mistype casing in a path so we use

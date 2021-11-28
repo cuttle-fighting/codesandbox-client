@@ -4,7 +4,9 @@ const merge = require('webpack-merge');
 const WebpackBar = require('webpackbar');
 const commonConfig = require('./webpack.common');
 
-const devEntries = ['webpack-dev-server/client?/'];
+const devEntries = [
+  `webpack-dev-server/client?http://localhost:${process.env.PORT || 3000}`,
+];
 
 const APP_HOT = Boolean(process.env.APP_HOT);
 
@@ -13,7 +15,9 @@ module.exports = merge(
     entry: {
       app: APP_HOT
         ? [
-            'webpack-dev-server/client?http://localhost:3000',
+            `webpack-dev-server/client?http://localhost:${
+              process.env.PORT || 3000
+            }`,
             'webpack-hot-middleware/client',
           ]
         : devEntries,

@@ -229,24 +229,25 @@ function addMiddleware(devServer, index) {
         origin: [
           'http://localhost:3000',
           'http://localhost:3002',
+          'http://localhost:4001',
           'http://localhost:8000',
           'http://localhost:8001',
         ],
         credentials: true,
       })
     );
-    wsProxy = createProxyMiddleware({
-      target: PROXY_DOMAIN.replace('https', 'wss'),
-      changeOrigin: true,
-      ws: true,
-      autoRewrite: true,
-      headers: { Connection: 'keep-alive' },
-      protocolRewrite: true,
-      onProxyReqWs(proxyReq, req, socket, options, head) {
-        proxyReq.setHeader('Origin', PROXY_DOMAIN);
-      },
-    });
-    devServer.use('/socket', wsProxy);
+    // wsProxy = createProxyMiddleware({
+    //   target: PROXY_DOMAIN.replace('https', 'wss'),
+    //   changeOrigin: true,
+    //   ws: true,
+    //   autoRewrite: true,
+    //   headers: { Connection: 'keep-alive' },
+    //   protocolRewrite: true,
+    //   onProxyReqWs(proxyReq, req, socket, options, head) {
+    //     proxyReq.setHeader('Origin', PROXY_DOMAIN);
+    //   },
+    // });
+    // devServer.use('/socket', wsProxy);
     devServer.use(
       '/api',
       createProxyMiddleware({
@@ -276,6 +277,12 @@ function runDevServer(port, protocol, index) {
     // It is important to tell WebpackDevServer to use the same "root" path
     // as we specified in the config. In development, we always serve from /.
     publicPath: config.output.publicPath,
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, PATCH, OPTIONS',
+      'Access-Control-Allow-Headers':
+        'X-Requested-With, content-type, Authorization',
+    },
     // WebpackDevServer is noisy by default so we emit custom message instead
     // by listening to the compiler events with `compiler.hooks[...].tap` calls above.
     quiet: true,
