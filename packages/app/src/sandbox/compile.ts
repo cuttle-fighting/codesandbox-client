@@ -36,6 +36,8 @@ import handleExternalResources from './external-resources';
 import setScreen, { resetScreen } from './status-screen';
 import { showRunOnClick } from './status-screen/run-on-click';
 import { SCRIPT_VERSION } from '.';
+import { debuglog } from './mometa/utils/debuglog';
+import { transformCompileOptions } from './mometa';
 
 let manager: Manager | null = null;
 let actionsEnabled = false;
@@ -436,7 +438,7 @@ function overrideDocumentClose() {
 
 overrideDocumentClose();
 
-interface CompileOptions {
+export interface CompileOptions {
   sandboxId?: string | null;
   modules: { [path: string]: Module };
   customNpmRegistries?: NpmRegistry[];
@@ -454,7 +456,10 @@ interface CompileOptions {
   clearConsoleDisabled?: boolean;
 }
 
-async function compile(opts: CompileOptions) {
+async function compile(_opts: CompileOptions) {
+  debuglog(`before compile options:`, _opts);
+  const opts = transformCompileOptions(_opts);
+  debuglog(`after compile options:`, opts);
   const {
     sandboxId,
     modules,

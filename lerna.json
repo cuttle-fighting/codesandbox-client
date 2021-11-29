@@ -1,5 +1,9 @@
 {
   "lerna": "2.4.0",
-  "packages": ["packages/*", "standalone-packages/*"],
+  "packages": [
+    "packages/*",
+    "standalone-packages/*",
+    "packages/app/src/sandbox"
+  ],
   "version": "independent"
 }

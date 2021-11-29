@@ -13,6 +13,7 @@
       "packages/@types/styled-components",
       "packages/app",
       "packages/homepage",
+      "packages/app/src/sandbox",
       "packages/common",
       "packages/components",
       "packages/codesandbox-api",
@@ -34,6 +35,8 @@
     "nohoist": [
       "**/react-codemirror2",
       "**/react-codemirror2/**",
+      "react-dnd",
+      "react-dnd-html5-backend",
       "codesandbox-deps/tern"
     ]
   },
