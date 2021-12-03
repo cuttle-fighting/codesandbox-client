@@ -1,5 +1,5 @@
 import type { CompileOptions } from '../compile';
-import createMometaPreset from './preset';
+import { createMometaPreset } from './preset';
 
 export function transformCompileOptions(opts: CompileOptions) {
   const preset = createMometaPreset(opts);

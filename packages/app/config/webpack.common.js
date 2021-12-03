@@ -235,9 +235,27 @@ module.exports = {
         sideEffects: true,
       },
       {
+        test: /\.jsraw\.(j|t)sx?$/,
+        include: [paths.src],
+        use: [
+          {
+            loader: 'raw-loader',
+          },
+          {
+            loader: 'thread-loader',
+            options: threadPoolConfig,
+          },
+          {
+            loader: 'babel-loader',
+            options: babelConfig,
+          },
+        ],
+      },
+      {
         test: /\.(j|t)sx?$/,
         include: [paths.src, /@emmetio/],
         exclude: [
+          /\.jsraw\.(j|t)sx?$/,
           /eslint\.4\.1\.0\.min\.js$/,
           /typescriptServices\.js$/,
           /\.no-webpack\./,

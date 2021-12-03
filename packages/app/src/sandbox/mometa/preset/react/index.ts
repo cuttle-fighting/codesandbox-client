@@ -1,14 +1,13 @@
-import MemotaPreset from '../memota-preset';
+import MometaPreset from '../mometa-preset';
 
-export default class MemotaPresetReact extends MemotaPreset {
+export default class MemotaPresetReact extends MometaPreset {
   initialize() {
     super.initialize();
 
     this.prependEntryCode(
-      `
-
-    `,
-      { ext: '.js' }
+      // eslint-disable-next-line global-require
+      require('./entries/register.jsraw'),
+      { ext: '.js', path: '' }
     );
   }
 }

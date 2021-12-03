@@ -35,6 +35,8 @@ import {
 import { patchedResolve } from './utils/resolvePatch';
 import { loadBabelTypes } from './utils/babelTypes';
 import { ChildHandler } from '../../worker-transpiler/child-handler';
+import { createMometaBabelWorkerPreset } from '../../../../mometa/preset';
+import { debuglog } from '../../../../mometa/utils/debuglog';
 
 let fsInitialized = false;
 let fsLoading = false;
@@ -422,7 +424,7 @@ function normalizeV7Config(config) {
 }
 
 function getCustomConfig(
-  { config, codeSandboxPlugins },
+  { config, codeSandboxPlugins, mometaBWPreset },
   version: number,
   path: string,
   options: Object
@@ -445,6 +447,7 @@ function getCustomConfig(
           'proposal-class-properties',
           '@babel/plugin-transform-runtime',
           ...codeSandboxPlugins,
+          ...mometaBWPreset._appendPlugins,
         ],
       };
     }
@@ -471,6 +474,7 @@ function getCustomConfig(
           },
         ],
         ...codeSandboxPlugins,
+        ...mometaBWPreset._appendPlugins,
       ],
     };
   }
@@ -482,8 +486,9 @@ function getCustomConfig(
           'babel-plugin-csb-rename-import',
           ...config.plugins,
           ...codeSandboxPlugins,
+          ...mometaBWPreset._appendPlugins,
         ]
-      : codeSandboxPlugins,
+      : [...codeSandboxPlugins, ...mometaBWPreset._appendPlugins],
   };
 }
 
@@ -597,18 +602,9 @@ async function getBabelContext(opts) {
 }
 
 async function initBabel(opts) {
-  const {
-    path,
-    sandboxOptions,
-    babelTranspilerOptions,
-    config,
-    loaderOptions,
-    version,
-    hasMacros,
-    loaderContextId,
-  } = opts;
+  const mometaBWPreset = createMometaBabelWorkerPreset(opts);
 
-  const { disableCodeSandboxPlugins } = loaderOptions;
+  const { babelTranspilerOptions, version } = mometaBWPreset.opts;
 
   const babelUrl = babelTranspilerOptions && babelTranspilerOptions.babelURL;
   const babelEnvUrl =
@@ -623,6 +619,18 @@ async function initBabel(opts) {
         : `${process.env.CODESANDBOX_HOST || ''}/static/js/babel.6.26.min.js`
     );
   }
+
+  await mometaBWPreset.initBabel(Babel);
+
+  const {
+    path,
+    sandboxOptions,
+    config,
+    loaderOptions,
+    hasMacros,
+    loaderContextId,
+  } = mometaBWPreset.opts;
+  const { disableCodeSandboxPlugins } = loaderOptions;
 
   const stringifiedConfig = JSON.stringify(babelTranspilerOptions);
   if (stringifiedConfig && lastConfig !== stringifiedConfig) {
@@ -648,11 +656,12 @@ async function initBabel(opts) {
   ]);
 
   const customConfig = getCustomConfig(
-    { config, codeSandboxPlugins },
+    { config, codeSandboxPlugins, mometaBWPreset },
     version,
     path,
     loaderOptions
   );
+  debuglog('customConfig', { customConfig, mometaBWPreset });
 
   const flattenedPresets = flatten(customConfig.presets || []);
   const flattenedPlugins = flatten(customConfig.plugins || []);
@@ -895,4 +904,5 @@ function loadCustomTranspiler(babelUrl, babelEnvUrl) {
   remapBabelHack();
   registerCodeSandboxPlugins();
 }
+
 installErrorMock();

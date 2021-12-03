@@ -4,7 +4,7 @@ interface MemotaPresetConfig {
   main: string;
 }
 
-export default class MemotaPreset {
+export default class MometaPreset {
   public id: number;
   constructor(
     public compileOptions: CompileOptions,
@@ -45,12 +45,16 @@ export default class MemotaPreset {
 
   prependEntryCode(
     code: string,
-    { ext, deps }: { deps?: Record<any, any>; ext: string }
+    {
+      ext,
+      deps,
+      path,
+    }: { deps?: Record<any, any>; ext?: string; path?: string }
   ) {
     const modules = this.compileOptions.modules;
     const mod = modules[this.config.main];
 
-    const name = `__prepend/mod-${this.id++}${ext}`;
+    const name = path || `__prepend/mod-${this.id++}${ext}`;
     this.addModule(code, `/${name}`);
 
     mod.code = [`import ${JSON.stringify(`./${name}`)};`, mod.code].join('\n');
