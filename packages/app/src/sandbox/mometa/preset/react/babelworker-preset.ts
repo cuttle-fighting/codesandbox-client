@@ -10,6 +10,6 @@ export default class ReactBabelworkerPreset extends MometaBabelWorkerPreset {
       );
     }
 
-    this.appendPlugin('babel-plugin-mometa-react-inject');
+    this.prependPlugin('babel-plugin-mometa-react-inject');
   }
 }

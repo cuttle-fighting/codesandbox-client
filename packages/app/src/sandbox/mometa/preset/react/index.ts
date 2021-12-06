@@ -1,4 +1,5 @@
 import MometaPreset from '../mometa-preset';
+import './context/register';
 
 export default class MemotaPresetReact extends MometaPreset {
   initialize() {
@@ -7,7 +8,10 @@ export default class MemotaPresetReact extends MometaPreset {
     this.prependEntryCode(
       // eslint-disable-next-line global-require
       require('./entries/register.jsraw'),
-      { ext: '.js', path: '' }
+      {
+        ext: '.jsx',
+        path: '',
+      }
     );
   }
 }

@@ -563,6 +563,12 @@ async function compile(_opts: CompileOptions) {
       });
     }
 
+    Object.keys(dependencies).forEach(name => {
+      if (manager.getExports(name)) {
+        delete dependencies[name];
+      }
+    });
+
     const { manifest, isNewCombination } = await loadDependencies(
       dependencies,
       ({ done, total, remainingDependencies }) => {

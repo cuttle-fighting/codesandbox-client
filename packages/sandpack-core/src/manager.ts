@@ -755,6 +755,10 @@ export default class Manager implements IEvaluator {
     return mod;
   }
 
+  getExports(path: string) {
+    return BrowserFS.BFSRequire(path);
+  }
+
   // ALWAYS KEEP THIS METHOD IN SYNC WITH SYNC VERSION
   async resolveModuleAsync(opts: {
     path: string;
@@ -824,14 +828,19 @@ export default class Manager implements IEvaluator {
       }
 
       try {
-        resolvedPath = await resolveAsync(shimmedPath, {
-          filename: parentPath,
-          extensions: defaultExtensions.map(ext => '.' + ext),
-          isFile: this.isFile,
-          readFile: this.readFile,
-          moduleDirectories: this.getModuleDirectories(),
-          resolverCache: this.resolverCache,
-        });
+        const exports = this.getExports(shimmedPath);
+        if (!exports) {
+          resolvedPath = await resolveAsync(shimmedPath, {
+            filename: parentPath,
+            extensions: defaultExtensions.map(ext => '.' + ext),
+            isFile: this.isFile,
+            readFile: this.readFile,
+            moduleDirectories: this.getModuleDirectories(),
+            resolverCache: this.resolverCache,
+          });
+        } else {
+          resolvedPath = '//empty.js';
+        }
 
         endMeasure(measureKey, { silent: true, lastTime: measureStartTime });
 

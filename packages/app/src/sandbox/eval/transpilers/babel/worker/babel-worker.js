@@ -35,8 +35,8 @@ import {
 import { patchedResolve } from './utils/resolvePatch';
 import { loadBabelTypes } from './utils/babelTypes';
 import { ChildHandler } from '../../worker-transpiler/child-handler';
-import { createMometaBabelWorkerPreset } from '../../../../mometa/preset';
 import { debuglog } from '../../../../mometa/utils/debuglog';
+import { createMometaBabelWorkerPreset } from '../../../../mometa/create-babel-worker-preset';
 
 let fsInitialized = false;
 let fsLoading = false;
@@ -441,6 +441,7 @@ function getCustomConfig(
         },
         presets: ['env', 'react'],
         plugins: [
+          ...mometaBWPreset._prependPlugins,
           'transform-flow-strip-types',
           'babel-plugin-csb-rename-import',
           'transform-modules-commonjs',
@@ -455,6 +456,7 @@ function getCustomConfig(
     return {
       presets: ['es2015', 'react', 'stage-0'],
       plugins: [
+        ...mometaBWPreset._prependPlugins,
         'babel-plugin-csb-rename-import',
         'transform-es2015-modules-commonjs',
         'transform-class-properties',
@@ -483,12 +485,17 @@ function getCustomConfig(
     ...config,
     plugins: config.plugins
       ? [
+          ...mometaBWPreset._prependPlugins,
           'babel-plugin-csb-rename-import',
           ...config.plugins,
           ...codeSandboxPlugins,
           ...mometaBWPreset._appendPlugins,
         ]
-      : [...codeSandboxPlugins, ...mometaBWPreset._appendPlugins],
+      : [
+          ...mometaBWPreset._prependPlugins,
+          ...codeSandboxPlugins,
+          ...mometaBWPreset._appendPlugins,
+        ],
   };
 }
 

@@ -15,6 +15,7 @@ export type IBabel = {
 
 export default class MometaBabelWorkerPreset {
   public _appendPlugins = [];
+  public _prependPlugins = [];
   // eslint-disable-next-line no-empty-function
   constructor(public opts: any) {
     this.opts = this.transformOpts(opts);
@@ -22,6 +23,10 @@ export default class MometaBabelWorkerPreset {
 
   appendPlugin(name, opts?) {
     this._appendPlugins.push([name, opts]);
+  }
+
+  prependPlugin(name, opts?) {
+    this._prependPlugins.push([name, opts]);
   }
 
   transformOpts(opts: any) {

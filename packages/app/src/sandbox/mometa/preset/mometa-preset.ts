@@ -1,4 +1,16 @@
+import { omit } from 'lodash-es';
 import type { CompileOptions } from '../../compile';
+
+// @ts-ignore
+if (window.parent?.__externals_modules) {
+  // @ts-ignore
+  Object.keys(window.parent?.__externals_modules).forEach(name => {
+    // @ts-ignore
+    const mod = window.parent?.__externals_modules[name];
+    // @ts-ignore
+    BrowserFS.registerFileSystem(name, mod);
+  });
+}
 
 interface MemotaPresetConfig {
   main: string;
@@ -38,8 +50,15 @@ export default class MometaPreset {
       return;
     }
     const pkg = this.readPkg();
-    pkg.dependiences = pkg.dependiences || {};
-    Object.assign(pkg.dependiences, deps);
+    pkg.dependencies = pkg.dependencies || {};
+    Object.assign(pkg.dependencies, deps);
+    this.writePkg(pkg);
+  }
+
+  removeDeps(deps: string[]) {
+    const pkg = this.readPkg();
+    pkg.dependencies = pkg.dependencies || {};
+    pkg.dependencies = omit(pkg.dependencies, deps);
     this.writePkg(pkg);
   }
 
@@ -54,7 +73,7 @@ export default class MometaPreset {
     const modules = this.compileOptions.modules;
     const mod = modules[this.config.main];
 
-    const name = path || `__prepend/mod-${this.id++}${ext}`;
+    const name = path || `__mometa/prepend/mod-${this.id++}${ext}`;
     this.addModule(code, `/${name}`);
 
     mod.code = [`import ${JSON.stringify(`./${name}`)};`, mod.code].join('\n');
