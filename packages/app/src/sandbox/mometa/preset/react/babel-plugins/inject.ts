@@ -3,6 +3,8 @@
  */
 import { PluginObj, PluginPass } from '@babel/core';
 import templateBuilder from '@babel/template';
+import { addDefault } from '@babel/helper-module-imports';
+import * as hash from 'object-hash';
 
 export default function babelPluginMometaReactInject(api) {
   const { types: t } = api;
@@ -39,25 +41,10 @@ export default function babelPluginMometaReactInject(api) {
             text: path.toString(),
             filename: this.filename,
             emptyChildren: !path.node.children?.length,
-          };
-          // if (!path.node.children?.length) {
-          //   mometaData.emptyChildren = true
-          //   // const emptyChildrenPlc = this.emptyChildrenPlc || (this.emptyChildrenPlc = addDefault(path, '@@__moment/empty-children-placeholder', {nameHint: 'MometaEmptyChildrenPlaceholder'}))
-          //   // if (!path.node.closingElement) {
-          //   //   // @ts-ignore
-          //   //   path.node.closingElement = t.JSXClosingElement(
-          //   //     t.cloneDeep(path.node.openingElement.name)
-          //   //   )
-          //   // }
-          //   //
-          //   // const childNode = templateBuilder.expression(`<${emptyChildrenPlc.name} />`, {plugins: ['jsx']})() as any
-          //   // childNode.openingElement.attributes.push(t.cloneDeep(newProp));
-          //   // this.cache.add(childNode)
-          //   // path.node.children.push(
-          //   //   childNode
-          //   // )
-          // }
+          } as MometaData;
 
+
+          mometaData.hash = hash(mometaData)
           const objExp = templateBuilder.expression(
             JSON.stringify(mometaData)
           )();
@@ -68,6 +55,24 @@ export default function babelPluginMometaReactInject(api) {
           );
 
           openingElement.node.attributes.push(newProp);
+
+          if (!path.node.children?.length) {
+            const emptyChildrenPlc = this.emptyChildrenPlc || (this.emptyChildrenPlc = addDefault(path, '@@__moment/empty-placeholder', {nameHint: 'MometaEmptyPlaceholder'}))
+            if (!path.node.closingElement) {
+              // @ts-ignore
+              path.node.closingElement = t.JSXClosingElement(
+                t.cloneDeep(path.node.openingElement.name)
+              )
+            }
+
+            const childNode = templateBuilder.expression(`<${emptyChildrenPlc.name} />`, {plugins: ['jsx']})() as any
+            childNode.openingElement.attributes.push(t.cloneDeep(newProp));
+            this.cache.add(childNode)
+
+            path.node.children.push(
+              childNode
+            )
+          }
         },
       },
     },

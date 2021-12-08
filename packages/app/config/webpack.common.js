@@ -97,20 +97,20 @@ if (!isLint) {
 module.exports = {
   entry: SANDBOX_ONLY
     ? {
-        sandbox: [
-          require.resolve('./polyfills'),
-          path.join(paths.sandboxSrc, 'index.js'),
-        ],
-        'sandbox-startup': path.join(paths.sandboxSrc, 'startup.js'),
-      }
+      sandbox: [
+        require.resolve('./polyfills'),
+        path.join(paths.sandboxSrc, 'index.js'),
+      ],
+      'sandbox-startup': path.join(paths.sandboxSrc, 'startup.js'),
+    }
     : APP_HOT
-    ? {
+      ? {
         app: [
           require.resolve('./polyfills'),
           path.join(paths.appSrc, 'index.js'),
         ],
       }
-    : {
+      : {
         app: [
           require.resolve('./polyfills'),
           path.join(paths.appSrc, 'index.js'),
@@ -263,9 +263,9 @@ module.exports = {
         use: [
           !isLint
             ? {
-                loader: 'thread-loader',
-                options: threadPoolConfig,
-              }
+              loader: 'thread-loader',
+              options: threadPoolConfig,
+            }
             : false,
           {
             loader: 'babel-loader',
@@ -348,7 +348,7 @@ module.exports = {
               name: 'static/media/[name].[hash:8].[ext]',
             },
           },
-          { loader: 'svgo-loader' },
+          {loader: 'svgo-loader'},
         ],
       },
       {
@@ -391,7 +391,15 @@ module.exports = {
     ],
   },
 
-  externals: ['jsdom', 'prettier', 'cosmiconfig'],
+  externals: [
+    // eslint-disable-next-line consistent-return
+    SANDBOX_ONLY && ((_, request, callback) => {
+      if (/^(react|react-dom|react-dnd|@@__moment-external\/.+)$/.test(request)) {
+        return callback(null, `BrowserFS.BFSRequire(${JSON.stringify(request)})`);
+      }
+      callback();
+    }), 'jsdom', 'prettier', 'cosmiconfig'
+  ].filter(Boolean),
 
   resolve: {
     mainFields: ['browser', 'module', 'jsnext:main', 'main'],
@@ -425,127 +433,127 @@ module.exports = {
 
       ...(__PROFILING__
         ? {
-            'react-dom$': 'react-dom/profiling',
-            'scheduler/tracing': 'scheduler/tracing-profiling',
-          }
+          'react-dom$': 'react-dom/profiling',
+          'scheduler/tracing': 'scheduler/tracing-profiling',
+        }
         : {}),
     },
   },
   plugins: [
     ...(SANDBOX_ONLY
       ? [
-          new HtmlWebpackPlugin({
-            inject: true,
-            chunks: ['sandbox-startup', 'vendors~sandbox', 'sandbox'],
-            filename: 'bundler.html',
-            template: paths.sandboxHtml,
-            minify: __PROD__ && {
-              removeComments: true,
-              collapseWhitespace: true,
-              removeRedundantAttributes: true,
-              useShortDoctype: true,
-              removeEmptyAttributes: true,
-              removeStyleLinkTypeAttributes: true,
-              keepClosingSlash: true,
-              minifyJS: true,
-              minifyCSS: true,
-              minifyURLs: true,
-            },
-          }),
-          new ScriptExtHtmlWebpackPlugin({
-            custom: {
-              test: 'sandbox',
-              attribute: 'crossorigin',
-              value: 'anonymous',
-            },
-          }),
-        ]
+        new HtmlWebpackPlugin({
+          inject: true,
+          chunks: ['sandbox-startup', 'vendors~sandbox', 'sandbox'],
+          filename: 'bundler.html',
+          template: paths.sandboxHtml,
+          minify: __PROD__ && {
+            removeComments: true,
+            collapseWhitespace: true,
+            removeRedundantAttributes: true,
+            useShortDoctype: true,
+            removeEmptyAttributes: true,
+            removeStyleLinkTypeAttributes: true,
+            keepClosingSlash: true,
+            minifyJS: true,
+            minifyCSS: true,
+            minifyURLs: true,
+          },
+        }),
+        new ScriptExtHtmlWebpackPlugin({
+          custom: {
+            test: 'sandbox',
+            attribute: 'crossorigin',
+            value: 'anonymous',
+          },
+        }),
+      ]
       : [
-          // Generates an `index.html` file with the <script> injected.
-          new HtmlWebpackPlugin({
-            inject: true,
-            chunks: __PROD__ ? ['common-sandbox', 'common', 'app'] : ['app'],
-            chunksSortMode: 'manual',
-            filename: 'app.html',
-            template: paths.appHtml,
-            minify: __PROD__ && {
-              removeComments: false,
-              collapseWhitespace: true,
-              removeRedundantAttributes: true,
-              useShortDoctype: true,
-              removeEmptyAttributes: true,
-              removeStyleLinkTypeAttributes: true,
-              keepClosingSlash: true,
-              minifyJS: true,
-              minifyCSS: true,
-              minifyURLs: true,
-            },
-          }),
-          new HtmlWebpackPlugin({
-            inject: true,
-            chunks: __PROD__
-              ? [
-                  'sandbox-startup',
-                  'common-sandbox',
-                  'vendors~sandbox',
-                  'sandbox',
-                ]
-              : ['sandbox-startup', 'sandbox'],
-            chunksSortMode: 'manual',
-            filename: 'frame.html',
-            template: paths.sandboxHtml,
-            minify: __PROD__ && {
-              removeComments: true,
-              collapseWhitespace: true,
-              removeRedundantAttributes: true,
-              useShortDoctype: true,
-              removeEmptyAttributes: true,
-              removeStyleLinkTypeAttributes: true,
-              keepClosingSlash: true,
-              minifyJS: true,
-              minifyCSS: true,
-              minifyURLs: true,
-            },
-          }),
-          new ScriptExtHtmlWebpackPlugin({
-            custom: {
-              test: 'sandbox',
-              attribute: 'crossorigin',
-              value: 'anonymous',
-            },
-          }),
-          new HtmlWebpackPlugin({
-            inject: true,
-            chunks: __PROD__
-              ? ['common-sandbox', 'common', 'embed']
-              : ['embed'],
-            chunksSortMode: 'manual',
-            filename: 'embed.html',
-            template: path.join(paths.embedSrc, 'index.html'),
-            minify: __PROD__ && {
-              removeComments: false,
-              collapseWhitespace: true,
-              removeRedundantAttributes: true,
-              useShortDoctype: true,
-              removeEmptyAttributes: true,
-              removeStyleLinkTypeAttributes: true,
-              keepClosingSlash: true,
-              minifyJS: true,
-              minifyCSS: true,
-              minifyURLs: true,
-            },
-          }),
-        ]),
+        // Generates an `index.html` file with the <script> injected.
+        new HtmlWebpackPlugin({
+          inject: true,
+          chunks: __PROD__ ? ['common-sandbox', 'common', 'app'] : ['app'],
+          chunksSortMode: 'manual',
+          filename: 'app.html',
+          template: paths.appHtml,
+          minify: __PROD__ && {
+            removeComments: false,
+            collapseWhitespace: true,
+            removeRedundantAttributes: true,
+            useShortDoctype: true,
+            removeEmptyAttributes: true,
+            removeStyleLinkTypeAttributes: true,
+            keepClosingSlash: true,
+            minifyJS: true,
+            minifyCSS: true,
+            minifyURLs: true,
+          },
+        }),
+        new HtmlWebpackPlugin({
+          inject: true,
+          chunks: __PROD__
+            ? [
+              'sandbox-startup',
+              'common-sandbox',
+              'vendors~sandbox',
+              'sandbox',
+            ]
+            : ['sandbox-startup', 'sandbox'],
+          chunksSortMode: 'manual',
+          filename: 'frame.html',
+          template: paths.sandboxHtml,
+          minify: __PROD__ && {
+            removeComments: true,
+            collapseWhitespace: true,
+            removeRedundantAttributes: true,
+            useShortDoctype: true,
+            removeEmptyAttributes: true,
+            removeStyleLinkTypeAttributes: true,
+            keepClosingSlash: true,
+            minifyJS: true,
+            minifyCSS: true,
+            minifyURLs: true,
+          },
+        }),
+        new ScriptExtHtmlWebpackPlugin({
+          custom: {
+            test: 'sandbox',
+            attribute: 'crossorigin',
+            value: 'anonymous',
+          },
+        }),
+        new HtmlWebpackPlugin({
+          inject: true,
+          chunks: __PROD__
+            ? ['common-sandbox', 'common', 'embed']
+            : ['embed'],
+          chunksSortMode: 'manual',
+          filename: 'embed.html',
+          template: path.join(paths.embedSrc, 'index.html'),
+          minify: __PROD__ && {
+            removeComments: false,
+            collapseWhitespace: true,
+            removeRedundantAttributes: true,
+            useShortDoctype: true,
+            removeEmptyAttributes: true,
+            removeStyleLinkTypeAttributes: true,
+            keepClosingSlash: true,
+            minifyJS: true,
+            minifyCSS: true,
+            minifyURLs: true,
+          },
+        }),
+      ]),
     // Makes some environment variables available to the JS code, for example:
     // if (process.env.NODE_ENV === 'development') { ... }. See `env.js`.
     new webpack.DefinePlugin(env.default),
     SANDBOX_ONLY &&
-      __DEV__ &&
-      new webpack.DefinePlugin({
-        'process.env.CODESANDBOX_HOST': publicPath.replace(/\/+$/, ''),
-      }),
+    __DEV__ &&
+    new webpack.DefinePlugin({
+      'process.env.CODESANDBOX_HOST': publicPath.replace(/\/+$/, ''),
+    }),
 
-    new webpack.DefinePlugin({ __DEV__ }),
+    new webpack.DefinePlugin({__DEV__}),
     // Watcher doesn't work well if you mistype casing in a path so we use
     // a plugin that prints an error when you attempt to do this.
     // See https://github.com/facebookincubator/create-react-app/issues/240
@@ -554,10 +562,10 @@ module.exports = {
     // With this plugin we override the load-rules of eslint, this function prevents
     // us from using eslint in the browser, therefore we need to stop it!
     !SANDBOX_ONLY &&
-      new webpack.NormalModuleReplacementPlugin(
-        new RegExp(['eslint', 'lib', 'load-rules'].join(sepRe)),
-        path.join(paths.config, 'stubs/load-rules.compiled.js')
-      ),
+    new webpack.NormalModuleReplacementPlugin(
+      new RegExp(['eslint', 'lib', 'load-rules'].join(sepRe)),
+      path.join(paths.config, 'stubs/load-rules.compiled.js')
+    ),
 
     // DON'T TOUCH THIS. There's a bug in Webpack 4 that causes bundle splitting
     // to break when using lru-cache. So we literally gice them our own version
@@ -573,11 +581,11 @@ module.exports = {
     new WatchMissingNodeModulesPlugin(paths.appNodeModules),
 
     __PROD__ &&
-      new MiniCssExtractPlugin({
-        // Options similar to the same options in webpackOptions.output
-        // both options are optional
-        filename: 'static/css/[name].[contenthash:8].css',
-        chunkFilename: 'static/css/[name].[contenthash:8].chunk.css',
-      }),
+    new MiniCssExtractPlugin({
+      // Options similar to the same options in webpackOptions.output
+      // both options are optional
+      filename: 'static/css/[name].[contenthash:8].css',
+      chunkFilename: 'static/css/[name].[contenthash:8].chunk.css',
+    }),
   ].filter(Boolean),
 };

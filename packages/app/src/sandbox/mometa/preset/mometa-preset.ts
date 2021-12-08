@@ -1,16 +1,6 @@
 import { omit } from 'lodash-es';
 import type { CompileOptions } from '../../compile';
 
-// @ts-ignore
-if (window.parent?.__externals_modules) {
-  // @ts-ignore
-  Object.keys(window.parent?.__externals_modules).forEach(name => {
-    // @ts-ignore
-    const mod = window.parent?.__externals_modules[name];
-    // @ts-ignore
-    BrowserFS.registerFileSystem(name, mod);
-  });
-}
 
 interface MemotaPresetConfig {
   main: string;
