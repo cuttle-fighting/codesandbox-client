@@ -1,7 +1,7 @@
 // @ts-nocheck
 import React from 'react';
-import { DndProvider } from 'react-dnd';
-import { DndLayout } from '@@__moment/dnd-utils';
+import { RootProvider } from '@@__mometa-external/shared';
+import { DndLayout } from '@@__mometa/dnd-utils';
 
 const rawRender = require('react-dom').render;
 require('react-dom').render = function _render(...argv) {
@@ -9,9 +9,9 @@ require('react-dom').render = function _render(...argv) {
 
   // eslint-disable-next-line no-console
   return rawRender.apply(this, [
-    <DndProvider>
+    <RootProvider>
       <DndLayout dom={dom}>{elem}</DndLayout>
-    </DndProvider>,
+    </RootProvider>,
     dom,
     cb,
   ]);

@@ -39,6 +39,10 @@ module.exports = {
     require.resolve('babel-plugin-macros'),
     require.resolve('babel-plugin-graphql-tag'),
     require.resolve('@babel/plugin-transform-react-display-name'),
+    [
+      require.resolve('babel-plugin-import'),
+      { libraryName: 'antd', style: 'css' },
+    ],
     // Optimization: hoist JSX that never changes out of render()
     // Disabled because of issues:
     // * https://github.com/facebookincubator/create-react-app/issues/525

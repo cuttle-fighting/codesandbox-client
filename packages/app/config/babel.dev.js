@@ -36,5 +36,9 @@ module.exports = {
     require.resolve('babel-plugin-graphql-tag'),
     require.resolve('@babel/plugin-proposal-class-properties'),
     require.resolve('@babel/plugin-transform-react-display-name'),
+    [
+      require.resolve('babel-plugin-import'),
+      { libraryName: 'antd', style: 'css' },
+    ],
   ],
 };

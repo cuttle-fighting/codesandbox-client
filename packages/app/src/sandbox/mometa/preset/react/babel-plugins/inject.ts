@@ -35,6 +35,10 @@ export default function babelPluginMometaReactInject(api) {
             return;
           }
 
+          const jsxExpContainerPath = path.findParent(pPath =>
+            pPath.isJSXExpressionContainer()
+          );
+
           const mometaData = {
             ...path.node.loc,
             name: openingElement.get('name')?.toString(),
@@ -43,8 +47,17 @@ export default function babelPluginMometaReactInject(api) {
             emptyChildren: !path.node.children?.length,
           } as MometaData;
 
+          mometaData.hash = hash(mometaData);
+          if (jsxExpContainerPath) {
+            const container = {
+              text: jsxExpContainerPath.toString(),
+            };
+            mometaData.container = {
+              ...container,
+              hash: hash(container),
+            };
+          }
 
-          mometaData.hash = hash(mometaData)
           const objExp = templateBuilder.expression(
             JSON.stringify(mometaData)
           )();
@@ -57,21 +70,28 @@ export default function babelPluginMometaReactInject(api) {
           openingElement.node.attributes.push(newProp);
 
           if (!path.node.children?.length) {
-            const emptyChildrenPlc = this.emptyChildrenPlc || (this.emptyChildrenPlc = addDefault(path, '@@__moment/empty-placeholder', {nameHint: 'MometaEmptyPlaceholder'}))
+            const emptyChildrenPlc =
+              this.emptyChildrenPlc ||
+              (this.emptyChildrenPlc = addDefault(
+                path,
+                '@@__mometa/empty-placeholder',
+                { nameHint: 'MometaEmptyPlaceholder' }
+              ));
             if (!path.node.closingElement) {
               // @ts-ignore
               path.node.closingElement = t.JSXClosingElement(
                 t.cloneDeep(path.node.openingElement.name)
-              )
+              );
             }
 
-            const childNode = templateBuilder.expression(`<${emptyChildrenPlc.name} />`, {plugins: ['jsx']})() as any
+            const childNode = templateBuilder.expression(
+              `<${emptyChildrenPlc.name} />`,
+              { plugins: ['jsx'] }
+            )() as any;
             childNode.openingElement.attributes.push(t.cloneDeep(newProp));
-            this.cache.add(childNode)
+            this.cache.add(childNode);
 
-            path.node.children.push(
-              childNode
-            )
+            path.node.children.push(childNode);
           }
         },
       },

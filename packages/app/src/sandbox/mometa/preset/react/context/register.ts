@@ -1,10 +1,10 @@
 BrowserFS.registerFileSystem(
-  '@@__moment/dnd-utils',
+  '@@__mometa/dnd-utils',
   require('./dnd-utils.tsx')
 );
 
 BrowserFS.registerFileSystem(
-  '@@__moment/empty-placeholder',
+  '@@__mometa/empty-placeholder',
   require('./empty-placeholder.tsx')
 );
 

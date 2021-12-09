@@ -14,10 +14,13 @@
     <script>
     window.process = BrowserFS.BFSRequire('process');
     window.Buffer = BrowserFS.BFSRequire('buffer').Buffer;
+    if (window.parent) {
+      window.parent.BrowserFS = BrowserFS
+    }
   </script>
   </head>
 
-  <body>
+  <body style="padding: 12px 20px; margin: 0">
     <div id="csb-loading-screen"></div>
   </body>
 
