@@ -1,4 +1,4 @@
-import './register'
+import './register';
 import type { CompileOptions } from '../compile';
 import { createMometaPreset } from './preset';
 

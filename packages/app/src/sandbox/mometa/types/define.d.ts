@@ -1,6 +1,4 @@
-
-
 declare module '@@__moment*' {
-  let exp: any
-  export = exp
+  let exp: any;
+  export = exp;
 }

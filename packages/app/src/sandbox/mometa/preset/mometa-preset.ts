@@ -1,7 +1,6 @@
 import { omit } from 'lodash-es';
 import type { CompileOptions } from '../../compile';
 
-
 interface MemotaPresetConfig {
   main: string;
 }

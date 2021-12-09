@@ -1,4 +1,4 @@
-import './mometa/register'
+import './mometa/register';
 import { camelizeKeys } from 'humps';
 import { isStandalone, listen, dispatch } from 'codesandbox-api';
 import _debug from '@codesandbox/common/lib/utils/debug';
