@@ -8,6 +8,11 @@ BrowserFS.registerFileSystem(
   require('./empty-placeholder.tsx')
 );
 
+BrowserFS.registerFileSystem(
+  '@@__mometa/hmr-manager',
+  require('./hmr-manager.ts')
+);
+
 // BrowserFS.registerFileSystem(
 //   '@@__moment/floating-ui',
 //   require('./floating-ui.tsx')

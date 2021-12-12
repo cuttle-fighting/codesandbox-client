@@ -1,13 +1,16 @@
 import React from 'react';
 import { css } from '@emotion/css';
-import { createReactBehaviorSubject } from '@rcp/use.behaviorsubject';
 import { useDragDropManager, useDrop } from 'react-dnd';
 import {
   addCss,
   parseReactDomNode,
   setStyle,
 } from 'sandbox/mometa/utils/dom-api';
-import { useHeaderStatus } from '@@__mometa-external/shared';
+import {
+  useHeaderStatus,
+  useSelectedNode,
+  useOveringNode,
+} from '@@__mometa-external/shared';
 import { OveringFloat } from './floating-ui';
 import { MometaHTMLElement, MometaDomApi } from './dom-api';
 
@@ -102,9 +105,6 @@ function useMometaDomInject(dom: MometaHTMLElement) {
     };
   }, [dom]);
 }
-
-const { useSubject: useOveringNode } = createReactBehaviorSubject(null);
-const { useSubject: useSelectedNode } = createReactBehaviorSubject(null);
 
 export const DndDropableNode = React.memo(
   ({ dom }: { dom: MometaHTMLElement }) => {

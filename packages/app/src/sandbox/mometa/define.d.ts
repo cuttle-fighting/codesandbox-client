@@ -3,6 +3,9 @@ declare module '@@__mometa*' {
   export = exp;
 
   export const useHeaderStatus: any;
+  export const useOveringNode: any;
+  export const useSelectedNode: any;
+  export const api: any;
 }
 
 interface MometaData {
@@ -17,9 +20,4 @@ interface MometaData {
     text: string;
     hash: string;
   };
-}
-
-declare const enum OpType {
-  DEL,
-  INSERT,
 }

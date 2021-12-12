@@ -2,7 +2,6 @@ import React from 'react';
 import { createPortal } from 'react-dom';
 import { computePosition, shift, flip, offset } from '@floating-ui/dom';
 import { getScrollParents } from '@floating-ui/react-dom';
-import lazy from 'lazy-value';
 import c from 'classnames';
 import {
   ArrowUpOutlined,
@@ -13,6 +12,7 @@ import {
 import { css } from '@emotion/css';
 import usePersistFn from '@rcp/use.persistfn';
 import { api } from '@@__mometa-external/shared';
+import { OpType } from 'sandbox/mometa/const';
 import { MometaHTMLElement, useProxyEvents } from './dom-api';
 
 export function computePos(targetElem, floatingElem) {
@@ -57,7 +57,11 @@ function usePosition(dom: HTMLElement) {
   return data;
 }
 
-const globalGetContainer = lazy(() => {
+let gDiv;
+const globalGetContainer = () => {
+  if (gDiv && gDiv.parentElement) {
+    return gDiv;
+  }
   const div = document.createElement('div');
   Object.assign(div.style, {
     position: 'fixed',
@@ -65,8 +69,9 @@ const globalGetContainer = lazy(() => {
     top: 0,
   });
   document.body.appendChild(div);
+  gDiv = div;
   return div;
-});
+};
 
 type FloatingUiProps = JSX.IntrinsicElements['div'] & {
   getContainer?: () => HTMLElement;
